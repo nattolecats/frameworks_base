@@ -253,7 +253,7 @@ public class PixelPropsUtils {
                 || packageName.startsWith(SAMSUNG)
                 || Arrays.asList(extraPackagesToChange).contains(packageName)) {
 
-            boolean isPixelDevice = Arrays.asList(pixelCodenames).contains(SystemProperties.get(DEVICE));
+            boolean isPixelDevice = false; //Arrays.asList(pixelCodenames).contains(SystemProperties.get(DEVICE));
 
             if (packageName.equals("com.google.android.apps.photos")) {
                 if (SystemProperties.getBoolean("persist.sys.pixelprops.gphotos", true)) {
