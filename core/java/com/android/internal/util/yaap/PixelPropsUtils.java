@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
+import android.os.SystemProperties;
 import android.util.Log;
 
 import com.android.internal.R;
@@ -37,13 +38,28 @@ public final class PixelPropsUtils {
     private static final String PACKAGE_GMS = "com.google.android.gms";
     private static final String PROCESS_GMS_UNSTABLE = PACKAGE_GMS + ".unstable";
     private static final String VERSION_PREFIX = "VERSION.";
+    private static final String PACKAGE_GPHOTOS = "com.google.android.apps.photos";
+
+    private static final String SPOOF_PIXEL_GPHOTOS = "persist.sys.pixelprops.gphotos";
 
     private final HashMap<String, Object> certifiedProps;
 
     private static volatile boolean sIsFinsky = false;
     private static volatile boolean sIsEnabled = false;
+    private static volatile boolean sIsPhotos = false;
 
     private static PixelPropsUtils sInstance = null;
+
+    private static final Map<String, String> sPixelXLProps = Map.of(
+        "PRODUCT", "marlin",
+        "DEVICE", "marlin",
+        "HARDWARE", "marlin",
+        "MANUFACTURER", "Google",
+        "BRAND", "google",
+        "MODEL", "Pixel XL",
+        "ID", "QP1A.191005.007.A3",
+        "FINGERPRINT", "google/marlin/marlin:10/QP1A.191005.007.A3/5972272:user/release-keys"
+    );
 
     public static PixelPropsUtils getInstance(Context context) {
         if (sInstance == null) {
@@ -119,6 +135,12 @@ public final class PixelPropsUtils {
             return;
         }
         Logger.d("Package = " + packageName);
+        sIsPhotos = packageName.equals(PACKAGE_GPHOTOS) &&
+                    SystemProperties.getBoolean(SPOOF_PIXEL_GPHOTOS, false);
+        if (sIsPhotos) {
+            sPixelXLProps.forEach(PixelPropsUtils::setPropValue);
+            return;
+        }
         sIsFinsky = packageName.equals(PACKAGE_FINSKY);
         if (sIsFinsky || !packageName.equals(PACKAGE_GMS) ||
                 !PROCESS_GMS_UNSTABLE.equals(Application.getProcessName())) {
